@@ -1,8 +1,9 @@
 defmodule Watwitter.AccountsTest do
   use Watwitter.DataCase
 
+  import Watwitter.Factory
+
   alias Watwitter.Accounts
-  import Watwitter.AccountsFixtures
   alias Watwitter.Accounts.{User, UserToken}
 
   describe "get_user_by_email/1" do
@@ -11,7 +12,7 @@ defmodule Watwitter.AccountsTest do
     end
 
     test "returns the user if the email exists" do
-      %{id: id} = user = user_fixture()
+      %{id: id} = user = insert(:user)
       assert %User{id: ^id} = Accounts.get_user_by_email(user.email)
     end
   end
@@ -22,15 +23,15 @@ defmodule Watwitter.AccountsTest do
     end
 
     test "does not return the user if the password is not valid" do
-      user = user_fixture()
+      user = insert(:user)
       refute Accounts.get_user_by_email_and_password(user.email, "invalid")
     end
 
     test "returns the user if the email and password are valid" do
-      %{id: id} = user = user_fixture()
+      password = "secret password"
+      %{id: id} = user = insert(:user, password: password)
 
-      assert %User{id: ^id} =
-               Accounts.get_user_by_email_and_password(user.email, valid_user_password())
+      assert %User{id: ^id} = Accounts.get_user_by_email_and_password(user.email, password)
     end
   end
 
@@ -42,7 +43,7 @@ defmodule Watwitter.AccountsTest do
     end
 
     test "returns the user with the given id" do
-      %{id: id} = user = user_fixture()
+      %{id: id} = user = insert(:user)
       assert %User{id: ^id} = Accounts.get_user!(user.id)
     end
   end
@@ -74,7 +75,7 @@ defmodule Watwitter.AccountsTest do
     end
 
     test "validates email uniqueness" do
-      %{email: email} = user_fixture()
+      %{email: email} = insert(:user)
       {:error, changeset} = Accounts.register_user(%{email: email})
       assert "has already been taken" in errors_on(changeset).email
 
@@ -84,8 +85,9 @@ defmodule Watwitter.AccountsTest do
     end
 
     test "registers users with a hashed password" do
-      email = unique_user_email()
-      {:ok, user} = Accounts.register_user(%{email: email, password: valid_user_password()})
+      password = "secret password"
+      %{email: email} = params_for(:user, password: password)
+      {:ok, user} = Accounts.register_user(%{email: email, password: password})
       assert user.email == email
       assert is_binary(user.hashed_password)
       assert is_nil(user.confirmed_at)
@@ -109,49 +111,48 @@ defmodule Watwitter.AccountsTest do
 
   describe "apply_user_email/3" do
     setup do
-      %{user: user_fixture()}
+      password = "secret password"
+      user = insert(:user, password: password)
+      %{user: user, password: password}
     end
 
-    test "requires email to change", %{user: user} do
-      {:error, changeset} = Accounts.apply_user_email(user, valid_user_password(), %{})
+    test "requires email to change", %{user: user, password: password} do
+      {:error, changeset} = Accounts.apply_user_email(user, password, %{})
       assert %{email: ["did not change"]} = errors_on(changeset)
     end
 
-    test "validates email", %{user: user} do
-      {:error, changeset} =
-        Accounts.apply_user_email(user, valid_user_password(), %{email: "not valid"})
+    test "validates email", %{user: user, password: password} do
+      {:error, changeset} = Accounts.apply_user_email(user, password, %{email: "not valid"})
 
       assert %{email: ["must have the @ sign and no spaces"]} = errors_on(changeset)
     end
 
-    test "validates maximum value for email for security", %{user: user} do
+    test "validates maximum value for email for security", %{user: user, password: password} do
       too_long = String.duplicate("db", 100)
 
-      {:error, changeset} =
-        Accounts.apply_user_email(user, valid_user_password(), %{email: too_long})
+      {:error, changeset} = Accounts.apply_user_email(user, password, %{email: too_long})
 
       assert "should be at most 160 character(s)" in errors_on(changeset).email
     end
 
-    test "validates email uniqueness", %{user: user} do
-      %{email: email} = user_fixture()
+    test "validates email uniqueness", %{user: user, password: password} do
+      other_user = insert(:user)
 
-      {:error, changeset} =
-        Accounts.apply_user_email(user, valid_user_password(), %{email: email})
+      {:error, changeset} = Accounts.apply_user_email(user, password, %{email: other_user.email})
 
       assert "has already been taken" in errors_on(changeset).email
     end
 
     test "validates current password", %{user: user} do
-      {:error, changeset} =
-        Accounts.apply_user_email(user, "invalid", %{email: unique_user_email()})
+      %{email: email} = params_for(:user)
+      {:error, changeset} = Accounts.apply_user_email(user, "invalid", %{email: email})
 
       assert %{current_password: ["is not valid"]} = errors_on(changeset)
     end
 
-    test "applies the email without persisting it", %{user: user} do
-      email = unique_user_email()
-      {:ok, user} = Accounts.apply_user_email(user, valid_user_password(), %{email: email})
+    test "applies the email without persisting it", %{user: user, password: password} do
+      %{email: email} = params_for(:user)
+      {:ok, user} = Accounts.apply_user_email(user, password, %{email: email})
       assert user.email == email
       assert Accounts.get_user!(user.id).email != email
     end
@@ -159,7 +160,7 @@ defmodule Watwitter.AccountsTest do
 
   describe "deliver_update_email_instructions/3" do
     setup do
-      %{user: user_fixture()}
+      %{user: insert(:user)}
     end
 
     test "sends token through notification", %{user: user} do
@@ -178,8 +179,8 @@ defmodule Watwitter.AccountsTest do
 
   describe "update_user_email/2" do
     setup do
-      user = user_fixture()
-      email = unique_user_email()
+      user = insert(:user)
+      %{email: email} = params_for(:user)
 
       token =
         extract_user_token(fn url ->
@@ -228,12 +229,13 @@ defmodule Watwitter.AccountsTest do
 
   describe "update_user_password/3" do
     setup do
-      %{user: user_fixture()}
+      password = "secret password"
+      %{user: insert(:user, password: password), password: password}
     end
 
-    test "validates password", %{user: user} do
+    test "validates password", %{user: user, password: password} do
       {:error, changeset} =
-        Accounts.update_user_password(user, valid_user_password(), %{
+        Accounts.update_user_password(user, password, %{
           password: "not valid",
           password_confirmation: "another"
         })
@@ -244,25 +246,26 @@ defmodule Watwitter.AccountsTest do
              } = errors_on(changeset)
     end
 
-    test "validates maximum values for password for security", %{user: user} do
+    test "validates maximum values for password for security", %{user: user, password: password} do
       too_long = String.duplicate("db", 100)
 
-      {:error, changeset} =
-        Accounts.update_user_password(user, valid_user_password(), %{password: too_long})
+      {:error, changeset} = Accounts.update_user_password(user, password, %{password: too_long})
 
       assert "should be at most 80 character(s)" in errors_on(changeset).password
     end
 
     test "validates current password", %{user: user} do
+      new_password = "super different secret password"
+
       {:error, changeset} =
-        Accounts.update_user_password(user, "invalid", %{password: valid_user_password()})
+        Accounts.update_user_password(user, "invalid", %{password: new_password})
 
       assert %{current_password: ["is not valid"]} = errors_on(changeset)
     end
 
-    test "updates the password", %{user: user} do
+    test "updates the password", %{user: user, password: current_password} do
       {:ok, user} =
-        Accounts.update_user_password(user, valid_user_password(), %{
+        Accounts.update_user_password(user, current_password, %{
           password: "new valid password"
         })
 
@@ -270,11 +273,11 @@ defmodule Watwitter.AccountsTest do
       assert Accounts.get_user_by_email_and_password(user.email, "new valid password")
     end
 
-    test "deletes all tokens for the given user", %{user: user} do
+    test "deletes all tokens for the given user", %{user: user, password: password} do
       _ = Accounts.generate_user_session_token(user)
 
       {:ok, _} =
-        Accounts.update_user_password(user, valid_user_password(), %{
+        Accounts.update_user_password(user, password, %{
           password: "new valid password"
         })
 
@@ -284,7 +287,7 @@ defmodule Watwitter.AccountsTest do
 
   describe "generate_user_session_token/1" do
     setup do
-      %{user: user_fixture()}
+      %{user: insert(:user)}
     end
 
     test "generates a token", %{user: user} do
@@ -296,7 +299,7 @@ defmodule Watwitter.AccountsTest do
       assert_raise Ecto.ConstraintError, fn ->
         Repo.insert!(%UserToken{
           token: user_token.token,
-          user_id: user_fixture().id,
+          user_id: insert(:user).id,
           context: "session"
         })
       end
@@ -305,7 +308,7 @@ defmodule Watwitter.AccountsTest do
 
   describe "get_user_by_session_token/1" do
     setup do
-      user = user_fixture()
+      user = insert(:user)
       token = Accounts.generate_user_session_token(user)
       %{user: user, token: token}
     end
@@ -327,7 +330,7 @@ defmodule Watwitter.AccountsTest do
 
   describe "delete_session_token/1" do
     test "deletes the token" do
-      user = user_fixture()
+      user = insert(:user)
       token = Accounts.generate_user_session_token(user)
       assert Accounts.delete_session_token(token) == :ok
       refute Accounts.get_user_by_session_token(token)
@@ -336,7 +339,7 @@ defmodule Watwitter.AccountsTest do
 
   describe "deliver_user_confirmation_instructions/2" do
     setup do
-      %{user: user_fixture()}
+      %{user: insert(:user)}
     end
 
     test "sends token through notification", %{user: user} do
@@ -355,7 +358,7 @@ defmodule Watwitter.AccountsTest do
 
   describe "confirm_user/2" do
     setup do
-      user = user_fixture()
+      user = insert(:user)
 
       token =
         extract_user_token(fn url ->
@@ -389,7 +392,7 @@ defmodule Watwitter.AccountsTest do
 
   describe "deliver_user_reset_password_instructions/2" do
     setup do
-      %{user: user_fixture()}
+      %{user: insert(:user)}
     end
 
     test "sends token through notification", %{user: user} do
@@ -408,7 +411,7 @@ defmodule Watwitter.AccountsTest do
 
   describe "get_user_by_reset_password_token/1" do
     setup do
-      user = user_fixture()
+      user = insert(:user)
 
       token =
         extract_user_token(fn url ->
@@ -437,7 +440,7 @@ defmodule Watwitter.AccountsTest do
 
   describe "reset_user_password/2" do
     setup do
-      %{user: user_fixture()}
+      %{user: insert(:user)}
     end
 
     test "validates password", %{user: user} do

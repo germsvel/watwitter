@@ -2,7 +2,7 @@ defmodule WatwitterWeb.UserSettingsControllerTest do
   use WatwitterWeb.ConnCase, async: true
 
   alias Watwitter.Accounts
-  import Watwitter.AccountsFixtures
+  import Watwitter.Factory
 
   setup :register_and_log_in_user
 
@@ -21,10 +21,15 @@ defmodule WatwitterWeb.UserSettingsControllerTest do
   end
 
   describe "PUT /users/settings/update_password" do
-    test "updates the user password and resets tokens", %{conn: conn, user: user} do
+    test "updates the user password and resets tokens", %{conn: conn} do
+      password = "secret password"
+      user = insert(:user, password: password)
+
       new_password_conn =
-        put(conn, Routes.user_settings_path(conn, :update_password), %{
-          "current_password" => valid_user_password(),
+        conn
+        |> log_in_user(user)
+        |> put(Routes.user_settings_path(conn, :update_password), %{
+          "current_password" => password,
           "user" => %{
             "password" => "new valid password",
             "password_confirmation" => "new valid password"
@@ -59,11 +64,16 @@ defmodule WatwitterWeb.UserSettingsControllerTest do
 
   describe "PUT /users/settings/update_email" do
     @tag :capture_log
-    test "updates the user email", %{conn: conn, user: user} do
+    test "updates the user email", %{conn: conn} do
+      password = "secret password"
+      user = insert(:user, password: password)
+
       conn =
-        put(conn, Routes.user_settings_path(conn, :update_email), %{
-          "current_password" => valid_user_password(),
-          "user" => %{"email" => unique_user_email()}
+        conn
+        |> log_in_user(user)
+        |> put(Routes.user_settings_path(conn, :update_email), %{
+          "current_password" => password,
+          "user" => %{"email" => params_for(:user).email}
         })
 
       assert redirected_to(conn) == Routes.user_settings_path(conn, :edit)
@@ -87,7 +97,7 @@ defmodule WatwitterWeb.UserSettingsControllerTest do
 
   describe "GET /users/settings/confirm_email/:token" do
     setup %{user: user} do
-      email = unique_user_email()
+      email = params_for(:user).email
 
       token =
         extract_user_token(fn url ->
