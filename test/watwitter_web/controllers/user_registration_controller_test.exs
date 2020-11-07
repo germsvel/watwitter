@@ -1,7 +1,7 @@
 defmodule WatwitterWeb.UserRegistrationControllerTest do
   use WatwitterWeb.ConnCase, async: true
 
-  import Watwitter.AccountsFixtures
+  import Watwitter.Factory
 
   describe "GET /users/register" do
     test "renders registration page", %{conn: conn} do
@@ -12,7 +12,8 @@ defmodule WatwitterWeb.UserRegistrationControllerTest do
     end
 
     test "redirects if already logged in", %{conn: conn} do
-      conn = conn |> log_in_user(user_fixture()) |> get(Routes.user_registration_path(conn, :new))
+      user = insert(:user)
+      conn = conn |> log_in_user(user) |> get(Routes.user_registration_path(conn, :new))
       assert redirected_to(conn) == "/"
     end
   end
@@ -20,11 +21,11 @@ defmodule WatwitterWeb.UserRegistrationControllerTest do
   describe "POST /users/register" do
     @tag :capture_log
     test "creates account and logs the user in", %{conn: conn} do
-      email = unique_user_email()
+      user_params = %{"email" => "some@example.com", "password" => "random password"}
 
       conn =
         post(conn, Routes.user_registration_path(conn, :create), %{
-          "user" => %{"email" => email, "password" => valid_user_password()}
+          "user" => user_params
         })
 
       assert get_session(conn, :user_token)

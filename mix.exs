@@ -37,6 +37,7 @@ defmodule Watwitter.MixProject do
       {:phoenix, "~> 1.5.6"},
       {:phoenix_ecto, "~> 4.1"},
       {:ecto_sql, "~> 3.4"},
+      {:ex_machina, "~> 2.4", only: :test},
       {:postgrex, ">= 0.0.0"},
       {:phoenix_live_view, "~> 0.14.6"},
       {:floki, ">= 0.27.0", only: :test},

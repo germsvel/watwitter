@@ -3,10 +3,10 @@ defmodule WatwitterWeb.UserConfirmationControllerTest do
 
   alias Watwitter.Accounts
   alias Watwitter.Repo
-  import Watwitter.AccountsFixtures
+  import Watwitter.Factory
 
   setup do
-    %{user: user_fixture()}
+    %{user: insert(:user)}
   end
 
   describe "GET /users/confirm" do
