@@ -87,6 +87,7 @@ defmodule WatwitterWeb do
       # Import basic rendering functionality (render, render_layout, etc)
       import Phoenix.View
 
+      import WatwitterWeb.DateHelpers
       import WatwitterWeb.ErrorHelpers
       import WatwitterWeb.Gettext
       alias WatwitterWeb.Router.Helpers, as: Routes
