@@ -5,6 +5,160 @@
 
 @tailwind components;
 
+/* Watwitter Styles */
+// Layout (live)
+
+.screen-background {
+  @apply flex flex-col items-center justify-center w-screen h-screen mx-auto text-base text-gray-900 bg-gray-200;
+}
+
+.mobile-display {
+  @apply relative flex flex-col flex-1 w-full overflow-hidden bg-white shadow max-w-md my-10;
+}
+
+.footer {
+  @apply flex border-t border-gray-200;
+}
+
+.footer-items {
+  @apply flex items-center justify-center w-1/4 py-3;
+}
+
+.home-svg {
+  @apply fill-current stroke-current stroke-0 p-px text-blue-500 w-8 h-8;
+}
+
+// Timeline
+.new-post-button {
+  @apply absolute right-0 bottom-0 mb-16 mr-4 rounded-full bg-blue-500 shadow-lg text-white p-4;
+}
+
+.compose-svg {
+  @apply w-6 h-6 p-px fill-current;
+}
+
+.header {
+  @apply flex items-center px-4 py-3 border-b;
+}
+
+.header-avatar {
+  @apply rounded-full w-10 h-10;
+}
+
+.header-title {
+  @apply ml-6 text-lg font-extrabold;
+}
+
+.body {
+  @apply flex-1 overflow-scroll;
+}
+
+.new-posts-notice {
+  @apply border border-b border-gray-200 p-4 py-4 cursor-pointer flex flex-1 justify-center;
+}
+
+.load-more-placeholder {
+  @apply px-4 py-4 flex flex-1 justify-center;
+}
+
+.back-svg {
+  @apply w-6 h-6 p-px text-blue-500 fill-current;
+}
+
+// Post
+
+.post {
+  @apply flex px-4 py-3 border-b border-gray-200;
+}
+
+.avatar {
+  @apply w-10 h-10 mr-3 rounded-full;
+}
+
+.post-content {
+  @apply flex flex-col flex-1 min-w-0;
+}
+
+.post-header {
+  @apply flex text-sm;
+}
+
+.post-user-info {
+  @apply truncate text-gray-500;
+}
+
+.post-user-name {
+  @apply font-bold text-gray-900;
+}
+
+.post-user-username {
+  @apply pl-1 text-gray-500;
+}
+
+.post-date-info {
+  @apply flex-shrink-0;
+}
+
+.post-date-separator {
+  @apply px-1 text-gray-500;
+}
+
+.post-date {
+  @apply text-gray-500;
+}
+
+.post-body {
+  @apply text-sm;
+}
+
+.post-actions {
+  @apply flex justify-between mt-2 text-gray-500;
+}
+
+.post-action {
+  @apply flex;
+}
+
+.post-action-svg {
+  @apply w-5 h-5 p-px fill-current;
+}
+
+.post-action-count {
+  @apply text-sm p-px;
+}
+
+// Compose
+
+.compose-wrapper {
+  @apply px-3 mt-3 flex;
+}
+
+.compose-form {
+  @apply flex-1;
+}
+
+.compose-fields {
+  > * + * {
+    margin-top: 0.25rem;
+  }
+}
+
+.compose-box {
+  @apply border-gray-300 border-b-2;
+}
+
+.compose-textarea {
+  @apply w-full p-3;
+}
+
+.compose-actions {
+  @apply mt-4 flex flex-row-reverse;
+}
+
+.compose-btn {
+  @apply px-4 py-2 h-8 rounded-full flex items-center justify-center bg-blue-500 text-white;
+}
+
 @tailwind utilities;
 
 /* LiveView specific classes for your customizations */
@@ -56,5 +210,4 @@
 .invalid-feedback {
   color: #a94442;
   display: block;
-  margin: -1rem 0 2rem;
 }
