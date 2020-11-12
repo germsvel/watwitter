@@ -13,12 +13,20 @@ defmodule Watwitter.Timeline do
 
   ## Examples
 
-      iex> list_posts()
+      iex> list_posts(page: 1, per_page: 2)
       [%Post{}, ...]
 
   """
-  def list_posts do
-    Repo.all(Post)
+  def list_posts(opts \\ []) do
+    page = Keyword.get(opts, :page, 1)
+    per_page = Keyword.get(opts, :per_page, 10)
+
+    Repo.all(
+      from p in Post,
+        offset: ^((page - 1) * per_page),
+        limit: ^per_page,
+        order_by: [desc: p.id]
+    )
   end
 
   @doc """
