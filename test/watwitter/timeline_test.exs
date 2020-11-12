@@ -45,6 +45,28 @@ defmodule Watwitter.TimelineTest do
     end
   end
 
+  describe "inc_likes/1" do
+    test "increments a post's likes count" do
+      post = insert(:post, likes_count: 0)
+
+      {:ok, _post} = Timeline.inc_likes(post)
+      {:ok, updated_post} = Timeline.inc_likes(post)
+
+      assert updated_post.likes_count == 2
+    end
+  end
+
+  describe "inc_reposts/1" do
+    test "increments a post's reposts count" do
+      post = insert(:post, reposts_count: 0)
+
+      {:ok, _post} = Timeline.inc_reposts(post)
+      {:ok, updated_post} = Timeline.inc_reposts(post)
+
+      assert updated_post.reposts_count == 2
+    end
+  end
+
   describe "update_post/2" do
     test "update_post/2 with valid data updates the post" do
       post = insert(:post)

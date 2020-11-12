@@ -55,6 +55,22 @@ defmodule Watwitter.Timeline do
     |> Repo.insert()
   end
 
+  def inc_likes(%Post{id: id}) do
+    {1, [post]} =
+      from(p in Post, where: p.id == ^id, select: p)
+      |> Repo.update_all(inc: [likes_count: 1])
+
+    {:ok, post}
+  end
+
+  def inc_reposts(%Post{id: id}) do
+    {1, [post]} =
+      from(p in Post, where: p.id == ^id, select: p)
+      |> Repo.update_all(inc: [reposts_count: 1])
+
+    {:ok, post}
+  end
+
   @doc """
   Updates a post.
 
