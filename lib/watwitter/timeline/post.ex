@@ -7,14 +7,16 @@ defmodule Watwitter.Timeline.Post do
     field :likes_count, :integer, default: 0
     field :reposts_count, :integer, default: 0
 
+    belongs_to :user, Watwitter.Accounts.User
+
     timestamps()
   end
 
   @doc false
   def changeset(post, attrs) do
     post
-    |> cast(attrs, [:body])
-    |> validate_required([:body])
+    |> cast(attrs, [:body, :user_id])
+    |> validate_required([:body, :user_id])
     |> validate_length(:body, min: 2, max: 250)
   end
 end

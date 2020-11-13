@@ -2,6 +2,14 @@ defmodule Watwitter.Factory do
   use ExMachina.Ecto, repo: Watwitter.Repo
 
   alias Watwitter.Accounts.User
+  alias Watwitter.Timeline.Post
+
+  def post_factory do
+    %Post{
+      body: "This is a watweet",
+      user: build(:user)
+    }
+  end
 
   def user_factory(attrs) do
     default = %{

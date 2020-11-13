@@ -1,6 +1,8 @@
 defmodule Watwitter.TimelineTest do
   use Watwitter.DataCase
 
+  import Watwitter.Factory
+
   alias Watwitter.Timeline
   alias Watwitter.Timeline.Post
 
@@ -27,11 +29,13 @@ defmodule Watwitter.TimelineTest do
 
   describe "create_post/1" do
     test "create_post/1 with valid data creates a post" do
-      valid_attrs = %{body: "some body"}
+      user = insert(:user)
+      valid_attrs = params_for(:post, user_id: user.id)
       assert {:ok, %Post{} = post} = Timeline.create_post(valid_attrs)
-      assert post.body == "some body"
+      assert post.body == valid_attrs.body
       assert post.likes_count == 0
       assert post.reposts_count == 0
+      assert post.user_id == user.id
     end
 
     test "create_post/1 with invalid data returns error changeset" do
@@ -103,21 +107,5 @@ defmodule Watwitter.TimelineTest do
       post = insert(:post)
       assert %Ecto.Changeset{} = Timeline.change_post(post)
     end
-  end
-
-  def insert_list(count, :post, attrs \\ %{}) do
-    Stream.repeatedly(fn -> insert(:post, attrs) end)
-    |> Enum.take(count)
-  end
-
-  def insert(:post, attrs \\ %{}) do
-    default_attrs = %{body: "some body"}
-
-    {:ok, post} =
-      attrs
-      |> Enum.into(default_attrs)
-      |> Timeline.create_post()
-
-    post
   end
 end
