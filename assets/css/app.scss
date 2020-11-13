@@ -24,6 +24,10 @@
   @apply flex items-center justify-center w-1/4 py-3;
 }
 
+.footer-links {
+  @apply mx-auto py-4;
+}
+
 .home-svg {
   @apply fill-current stroke-current stroke-0 p-px text-blue-500 w-8 h-8;
 }
@@ -47,6 +51,10 @@
 
 .header-title {
   @apply ml-3 text-lg font-extrabold;
+}
+
+.section-title {
+  @apply mb-6 text-lg leading-6 font-medium text-gray-900;
 }
 
 .body {
@@ -153,6 +161,56 @@
 
 .compose-btn {
   @apply px-4 py-2 h-8 rounded-full flex items-center justify-center bg-blue-500 text-white;
+}
+
+// General forms
+
+.form-fields {
+  > * + * {
+    margin-top: 1.5rem;
+  }
+}
+
+.form-field {
+  > * + * {
+    margin-top: 0.25rem;
+  }
+}
+
+.form-wrapper {
+  @apply max-w-md mx-auto pt-10 pb-12 px-4 flex-1 overflow-scroll;
+}
+
+.form-label {
+  @apply block text-sm font-medium leading-5 text-gray-700;
+}
+
+.field-input {
+ @apply block w-full transition duration-150 ease-in-out rounded-md shadow-sm;
+}
+
+.form-action {
+  @apply block w-full rounded-md shadow-md;
+}
+
+.btn {
+  @apply flex justify-center py-2 px-4 text-sm font-medium rounded-md text-white bg-blue-600;
+}
+
+.btn-full {
+  @apply w-full;
+}
+
+.bth:hover {
+  @apply bg-blue-500;
+}
+
+.btn:focus {
+  @apply outline-none border-blue-700 shadow-outline-blue;
+}
+
+.btn:active {
+  @apply bg-blue-700;
 }
 
 @tailwind utilities;
