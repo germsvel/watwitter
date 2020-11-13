@@ -2,12 +2,17 @@ defmodule Watwitter.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias Watwitter.Avatar
+
   @derive {Inspect, except: [:password]}
   schema "users" do
+    field :name, :string
+    field :username, :string
     field :email, :string
     field :password, :string, virtual: true
     field :hashed_password, :string
     field :confirmed_at, :naive_datetime
+    field :avatar_url, :string
 
     timestamps()
   end
@@ -22,9 +27,19 @@ defmodule Watwitter.Accounts.User do
   """
   def registration_changeset(user, attrs) do
     user
-    |> cast(attrs, [:email, :password])
+    |> cast(attrs, [:name, :username, :email, :password])
+    |> validate_required([:name])
+    |> validate_username()
     |> validate_email()
     |> validate_password()
+    |> generate_avatar_url()
+  end
+
+  defp validate_username(changeset) do
+    changeset
+    |> validate_required([:username])
+    |> unsafe_validate_unique(:username, Watwitter.Repo)
+    |> unique_constraint(:username)
   end
 
   defp validate_email(changeset) do
@@ -40,9 +55,6 @@ defmodule Watwitter.Accounts.User do
     changeset
     |> validate_required([:password])
     |> validate_length(:password, min: 12, max: 80)
-    # |> validate_format(:password, ~r/[a-z]/, message: "at least one lower case character")
-    # |> validate_format(:password, ~r/[A-Z]/, message: "at least one upper case character")
-    # |> validate_format(:password, ~r/[!?@#$%^&*_0-9]/, message: "at least one digit or punctuation character")
     |> hash_password()
   end
 
@@ -53,6 +65,17 @@ defmodule Watwitter.Accounts.User do
       changeset
       |> put_change(:hashed_password, Bcrypt.hash_pwd_salt(password))
       |> delete_change(:password)
+    else
+      changeset
+    end
+  end
+
+  defp generate_avatar_url(changeset) do
+    if changeset.valid? do
+      email = get_change(changeset, :email)
+
+      changeset
+      |> put_change(:avatar_url, Avatar.generate(email))
     else
       changeset
     end
