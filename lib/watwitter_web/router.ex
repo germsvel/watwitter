@@ -18,7 +18,7 @@ defmodule WatwitterWeb.Router do
   end
 
   scope "/", WatwitterWeb do
-    pipe_through :browser
+    pipe_through [:browser, :require_authenticated_user]
 
     live "/", PageLive, :index
   end
