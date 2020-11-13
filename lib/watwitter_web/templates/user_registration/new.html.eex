@@ -12,6 +12,18 @@
 
     <div class="form-fields">
       <div class="form-field">
+        <%= label f, :name, class: "form-label" %>
+        <%= text_input f, :name, required: true, class: "form-input field-input" %>
+        <%= error_tag f, :name %>
+      </div>
+
+      <div class="form-field">
+        <%= label f, :username, class: "form-label" %>
+        <%= text_input f, :username, required: true, class: "form-input field-input" %>
+        <%= error_tag f, :username %>
+      </div>
+
+      <div class="form-field">
         <%= label f, :email, class: "form-label" %>
         <%= email_input f, :email, required: true, class: "form-input field-input" %>
         <%= error_tag f, :email %>

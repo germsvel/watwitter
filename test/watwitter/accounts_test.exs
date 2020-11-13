@@ -49,12 +49,14 @@ defmodule Watwitter.AccountsTest do
   end
 
   describe "register_user/1" do
-    test "requires email and password to be set" do
+    test "requires name, username, email, and password to be set" do
       {:error, changeset} = Accounts.register_user(%{})
 
       assert %{
                password: ["can't be blank"],
-               email: ["can't be blank"]
+               email: ["can't be blank"],
+               username: ["can't be blank"],
+               name: ["can't be blank"]
              } = errors_on(changeset)
     end
 
@@ -84,12 +86,28 @@ defmodule Watwitter.AccountsTest do
       assert "has already been taken" in errors_on(changeset).email
     end
 
-    test "registers users with a hashed password" do
-      password = "secret password"
-      %{email: email} = params_for(:user, password: password)
-      {:ok, user} = Accounts.register_user(%{email: email, password: password})
-      assert user.email == email
+    test "validates username uniqueness" do
+      %{username: username} = insert(:user)
+
+      {:error, changeset} = Accounts.register_user(%{username: username})
+      assert "has already been taken" in errors_on(changeset).username
+
+      {:error, changeset} = Accounts.register_user(%{username: String.upcase(username)})
+      assert "has already been taken" in errors_on(changeset).username
+    end
+
+    test "registers users with a hashed password and avatar_url" do
+      attrs = %{
+        password: "secret password",
+        email: "gandalfgraypilgrim@istari.com",
+        name: "Gandalf",
+        username: "gandalfthegray"
+      }
+
+      {:ok, user} = Accounts.register_user(attrs)
+      assert user.email == attrs.email
       assert is_binary(user.hashed_password)
+      assert is_binary(user.avatar_url)
       assert is_nil(user.confirmed_at)
       assert is_nil(user.password)
     end
@@ -98,7 +116,7 @@ defmodule Watwitter.AccountsTest do
   describe "change_user_registration/2" do
     test "returns a changeset" do
       assert %Ecto.Changeset{} = changeset = Accounts.change_user_registration(%User{})
-      assert changeset.required == [:password, :email]
+      assert changeset.required == [:password, :email, :username, :name]
     end
   end
 

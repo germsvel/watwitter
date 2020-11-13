@@ -21,7 +21,12 @@ defmodule WatwitterWeb.UserRegistrationControllerTest do
   describe "POST /users/register" do
     @tag :capture_log
     test "creates account and logs the user in", %{conn: conn} do
-      user_params = %{"email" => "some@example.com", "password" => "random password"}
+      user_params = %{
+        "name" => "Gandalf the Gray",
+        "username" => "gandalf",
+        "email" => "gandalf@example.com",
+        "password" => "random password"
+      }
 
       conn =
         post(conn, Routes.user_registration_path(conn, :create), %{

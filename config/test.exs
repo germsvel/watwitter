@@ -21,5 +21,7 @@ config :watwitter, WatwitterWeb.Endpoint,
   http: [port: 4002],
   server: false
 
+config :watwitter, :avatar_client, Watwitter.Avatar.TestClient
+
 # Print only warnings and errors during test
 config :logger, level: :warn
