@@ -1,27 +1,41 @@
-<h1>Log in</h1>
+<div class="header">
+  <h1 class="header-title">Log in</h1>
+</div>
 
-<%= form_for @conn, Routes.user_session_path(@conn, :create), [as: :user], fn f -> %>
-  <%= if @error_message do %>
-    <div class="alert alert-danger">
-      <p><%= @error_message %></p>
+<div class="form-wrapper">
+  <%= form_for @conn, Routes.user_session_path(@conn, :create), [as: :user], fn f -> %>
+    <%= if @error_message do %>
+      <div class="alert alert-danger">
+        <p><%= @error_message %></p>
+      </div>
+    <% end %>
+
+    <div class="form-fields">
+      <div class="form-field">
+        <%= label f, :email, class: "form-label" %>
+        <%= email_input f, :email, required: true, class: "form-input field-input" %>
+      </div>
+
+      <div class="form-field">
+        <%= label f, :password, class: "form-label" %>
+        <%= password_input f, :password, required: true, class: "form-input field-input" %>
+      </div>
+
+      <div class="form-field">
+        <%= label f, :remember_me, "Keep me logged in for 60 days", class: "form-label" %>
+        <%= checkbox f, :remember_me, class: "form-checkbox" %>
+      </div>
+
+      <div class="form-action">
+        <%= submit "Log in", class: "btn btn-full" %>
+      </div>
     </div>
   <% end %>
+</div>
 
-  <%= label f, :email %>
-  <%= email_input f, :email, required: true %>
-
-  <%= label f, :password %>
-  <%= password_input f, :password, required: true %>
-
-  <%= label f, :remember_me, "Keep me logged in for 60 days" %>
-  <%= checkbox f, :remember_me %>
-
-  <div>
-    <%= submit "Log in" %>
-  </div>
-<% end %>
-
-<p>
-  <%= link "Register", to: Routes.user_registration_path(@conn, :new) %> |
-  <%= link "Forgot your password?", to: Routes.user_reset_password_path(@conn, :new) %>
-</p>
+<footer class="footer">
+  <p class="footer-links">
+    <%= link "Register", to: Routes.user_registration_path(@conn, :new) %> |
+    <%= link "Forgot your password?", to: Routes.user_reset_password_path(@conn, :new) %>
+  </p>
+</footer>
