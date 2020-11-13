@@ -21,12 +21,13 @@ defmodule Watwitter.Timeline do
     page = Keyword.get(opts, :page, 1)
     per_page = Keyword.get(opts, :per_page, 10)
 
-    Repo.all(
-      from p in Post,
-        offset: ^((page - 1) * per_page),
-        limit: ^per_page,
-        order_by: [desc: p.id]
+    from(p in Post,
+      offset: ^((page - 1) * per_page),
+      limit: ^per_page,
+      order_by: [desc: p.id]
     )
+    |> Repo.all()
+    |> Repo.preload([:user])
   end
 
   @doc """
@@ -43,7 +44,7 @@ defmodule Watwitter.Timeline do
       ** (Ecto.NoResultsError)
 
   """
-  def get_post!(id), do: Repo.get!(Post, id)
+  def get_post!(id), do: Post |> Repo.get!(id) |> Repo.preload([:user])
 
   @doc """
   Creates a post.
