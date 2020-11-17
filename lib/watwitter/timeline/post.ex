@@ -7,6 +7,7 @@ defmodule Watwitter.Timeline.Post do
     field :likes_count, :integer, default: 0
     field :reposts_count, :integer, default: 0
 
+    has_many :likes, Watwitter.Timeline.Like
     belongs_to :user, Watwitter.Accounts.User
 
     timestamps()

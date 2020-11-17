@@ -56,6 +56,29 @@ defmodule Watwitter.TimelineTest do
     end
   end
 
+  describe "like_post!/2" do
+    test "creates a like for user and post" do
+      user = insert(:user)
+      post = insert(:post)
+
+      updated_post = Timeline.like_post!(post, user)
+
+      assert [like] = updated_post.likes
+      assert like.user_id == user.id
+      assert like.post_id == post.id
+    end
+
+    test "increments a post's likes count" do
+      [user1, user2] = insert_pair(:user)
+      post = insert(:post, likes_count: 0)
+
+      _updated_post = Timeline.like_post!(post, user1)
+      updated_post = Timeline.like_post!(post, user2)
+
+      assert updated_post.likes_count == 2
+    end
+  end
+
   describe "change_post/1" do
     test "change_post/1 returns a post changeset" do
       post = insert(:post)

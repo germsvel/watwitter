@@ -123,6 +123,14 @@
   @apply flex;
 }
 
+.post-reposted {
+  @apply text-green-500;
+}
+
+.post-liked {
+  @apply text-red-500;
+}
+
 .post-action-svg {
   @apply w-5 h-5 p-px fill-current;
 }
