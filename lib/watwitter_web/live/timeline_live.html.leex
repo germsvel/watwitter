@@ -2,3 +2,9 @@
   <img class="avatar" src="<%= @current_user.avatar_url %>">
   <h1 class="header-title">Home</h1>
 </header>
+
+<div class="body">
+  <%= for post <- @posts do %>
+    <%= live_component @socket, PostComponent, post: post %>
+  <% end %>
+</div>
