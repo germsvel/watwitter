@@ -11,4 +11,12 @@ defmodule WatwitterWeb.TimelineLiveTest do
     assert html =~ "Home"
     assert render(view) =~ "Home"
   end
+
+  test "current user can see own avatar", %{conn: conn, user: user} do
+    {:ok, view, _html} = live(conn, "/")
+
+    avatar = element(view, "img[src*=#{user.avatar_url}]")
+
+    assert has_element?(avatar)
+  end
 end
