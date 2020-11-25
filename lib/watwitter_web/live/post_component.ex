@@ -2,6 +2,7 @@ defmodule WatwitterWeb.PostComponent do
   use WatwitterWeb, :live_component
 
   alias WatwitterWeb.DateHelpers
+  alias WatwitterWeb.SVGHelpers
 
   def render(assigns) do
     ~L"""
@@ -31,11 +32,24 @@ defmodule WatwitterWeb.PostComponent do
         </div>
 
         <div class="post-actions">
-          <a class="post-action" href="#">
-          </a>
+          <%= if current_user_liked?(@post, @current_user) do %>
+            <a class="post-action post-liked" href="#" data-role="post-liked">
+              <%= SVGHelpers.liked_svg() %>
+              <span class="post-action-count" data-role="like-count"><%= @post.likes_count %></span>
+            </a>
+          <% else %>
+            <a class="post-action" href="#" data-role="like-button">
+              <%= SVGHelpers.like_svg() %>
+              <span class="post-action-count" data-role="like-count"><%= @post.likes_count %></span>
+            </a>
+          <% end %>
         </div>
       </div>
     </div>
     """
+  end
+
+  def current_user_liked?(post, user) do
+    user.id in Enum.map(post.likes, & &1.user_id)
   end
 end
