@@ -4,3 +4,20 @@
   <% end %>
   <h1 class="header-title">Compose Watweet</h1>
 </header>
+
+<div class="body">
+  <div class="compose-wrapper">
+    <img class="avatar" src="<%= @current_user.avatar_url %>">
+
+    <form class="compose-form">
+      <div class="compose-fields">
+        <div class="compose-box">
+        </div>
+      </div>
+
+      <div class="compose-actions">
+        <button class="compose-btn">Post<button>
+      </div>
+    </form>
+  </div>
+</div>
