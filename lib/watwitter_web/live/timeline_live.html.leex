@@ -13,6 +13,12 @@
   <% end %>
 </div>
 
+<div class="new-post-button">
+  <div>
+    <%= SVGHelpers.compose_svg() %>
+  </div>
+</div>
+
 <footer class="footer">
   <div class="footer-items">
     <%= live_redirect to: Routes.timeline_path(@socket, :index) do %>
