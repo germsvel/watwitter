@@ -38,6 +38,16 @@ defmodule Watwitter.TimelineTest do
       assert post.user_id == user.id
     end
 
+    test "broadcast post creation" do
+      Timeline.subscribe()
+      user = insert(:user)
+      params = params_for(:post, user_id: user.id)
+
+      {:ok, post} = Timeline.create_post(params)
+
+      assert_receive {:post_created, ^post}
+    end
+
     test "create_post/1 with invalid data returns error changeset" do
       assert {:error, %Ecto.Changeset{}} = Timeline.create_post(%{body: nil})
     end
