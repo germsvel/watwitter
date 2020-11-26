@@ -25,4 +25,16 @@ defmodule WatwitterWeb.ComposeLive do
         {:noreply, assign(socket, changeset: changeset)}
     end
   end
+
+  def handle_event("validate", %{"post" => post_params}, socket) do
+    current_user = socket.assigns.current_user
+    params = Map.put(post_params, "user_id", current_user.id)
+
+    changeset =
+      %Post{}
+      |> Timeline.change_post(params)
+      |> Map.put(:action, :insert)
+
+    {:noreply, assign(socket, changeset: changeset)}
+  end
 end
