@@ -221,6 +221,42 @@
   @apply bg-blue-700;
 }
 
+// show post
+
+// Show
+
+.show-post {
+  @apply flex flex-col px-6 pt-6 border-b border-gray-200;
+
+  > * + * {
+    margin-top: 1.25rem;
+  }
+}
+
+.show-header {
+  @apply flex items-center;
+}
+
+.show-user-info {
+  @apply ml-3 flex flex-col leading-tight;
+}
+
+.show-user-name {
+  @apply font-bold;
+}
+
+.show-user-username {
+  @apply text-gray-500;
+}
+
+.show-body {
+  @apply text-lg mb-3;
+}
+
+.show-actions {
+  @apply mx-6 py-2 border-t border-gray-200 flex justify-between text-gray-500;
+}
+
 @tailwind utilities;
 
 /* LiveView specific classes for your customizations */
