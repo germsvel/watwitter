@@ -14,10 +14,14 @@ defmodule WatwitterWeb.TimelineLive do
     {:ok, assign(socket, current_post: nil, posts: posts, current_user: current_user)}
   end
 
-  def handle_event("select-post", %{"id" => post_id}, socket) do
+  def handle_params(%{"post_id" => post_id}, _, socket) do
     id = String.to_integer(post_id)
     current_post = Enum.find(socket.assigns.posts, fn post -> post.id == id end)
 
     {:noreply, assign(socket, current_post: current_post)}
+  end
+
+  def handle_params(_, _, socket) do
+    {:noreply, socket}
   end
 end
