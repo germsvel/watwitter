@@ -5,7 +5,11 @@
 
 <div class="body">
   <%= for post <- @posts do %>
-    <%= live_component @socket, PostComponent, post: post, current_user: @current_user %>
+    <%= if @current_post && @current_post.id == post.id do %>
+      <%= live_component @socket, ShowPostComponent, post: post, current_user: @current_user %>
+    <% else %>
+      <%= live_component @socket, PostComponent, post: post, current_user: @current_user %>
+    <% end %>
   <% end %>
 </div>
 

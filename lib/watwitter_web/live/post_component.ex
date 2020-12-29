@@ -27,7 +27,7 @@ defmodule WatwitterWeb.PostComponent do
           </div>
         </div>
 
-        <div class="post-body">
+        <div phx-click="select-post" phx-value-id="<%= @post.id %>" data-role="show-post" class="post-body">
           <%= @post.body %>
         </div>
 
