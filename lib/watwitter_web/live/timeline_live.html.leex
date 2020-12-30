@@ -1,5 +1,7 @@
 <header class="header">
-  <img class="avatar" src="<%= @current_user.avatar_url %>">
+  <%= link to: Routes.user_settings_path(@socket, :edit), id: "user-avatar" do %>
+    <img class="avatar" src="<%= @current_user.avatar_url %>">
+  <% end %>
   <h1 class="header-title">Home</h1>
 </header>
 
@@ -14,9 +16,9 @@
 </div>
 
 <div class="new-post-button">
-  <div>
+  <%= live_redirect to: Routes.compose_path(@socket, :new), id: "compose-button" do %>
     <%= SVGHelpers.compose_svg() %>
-  </div>
+  <% end %>
 </div>
 
 <footer class="footer">
