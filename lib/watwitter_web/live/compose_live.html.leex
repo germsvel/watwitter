@@ -9,10 +9,12 @@
   <div class="compose-wrapper">
     <img class="avatar" src="<%= @current_user.avatar_url %>">
 
-    <form class="compose-form">
+    <%= f = form_for @changeset, "#", phx_submit: "save", id: "new-post",  class: "compose-form" %>
       <div class="compose-fields">
         <div class="compose-box">
+          <%= textarea f, :body, placeholder: "What's happening?", class: "compose-textarea" %>
         </div>
+        <%= error_tag f, :body %>
       </div>
 
       <div class="compose-actions">
