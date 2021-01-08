@@ -45,30 +45,6 @@ defmodule Watwitter.TimelineTest do
     end
   end
 
-  describe "update_post/2" do
-    test "update_post/2 with valid data updates the post" do
-      post = insert(:post)
-      update_attrs = %{body: "some updated body"}
-      assert {:ok, %Post{} = post} = Timeline.update_post(post, update_attrs)
-      assert post.body == "some updated body"
-    end
-
-    test "update_post/2 with invalid data returns error changeset" do
-      post = insert(:post)
-      invalid_attrs = %{body: nil}
-      assert {:error, %Ecto.Changeset{}} = Timeline.update_post(post, invalid_attrs)
-      assert post == Timeline.get_post!(post.id)
-    end
-  end
-
-  describe "delete_post/1" do
-    test "delete_post/1 deletes the post" do
-      post = insert(:post)
-      assert {:ok, %Post{}} = Timeline.delete_post(post)
-      assert_raise Ecto.NoResultsError, fn -> Timeline.get_post!(post.id) end
-    end
-  end
-
   describe "change_post/1" do
     test "change_post/1 returns a post changeset" do
       post = insert(:post)
