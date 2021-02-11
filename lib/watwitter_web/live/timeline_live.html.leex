@@ -6,6 +6,11 @@
 </header>
 
 <div class="body">
+  <%= if @new_posts_count > 0 do %>
+    <div id="new-posts-notice" class="new-posts-notice">
+      <%= ngettext("Show 1 post", "Show %{count} posts", @new_posts_count) %>
+    </div>
+  <% end %>
   <%= for post <- @posts do %>
     <%= if @current_post && @current_post.id == post.id do %>
       <%= live_component @socket, ShowPostComponent, post: post, current_user: @current_user %>
