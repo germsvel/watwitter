@@ -7,7 +7,7 @@
 
 <div class="body">
   <%= if @new_posts_count > 0 do %>
-    <div id="new-posts-notice" class="new-posts-notice">
+    <div phx-click="show-new-posts" id="new-posts-notice" class="new-posts-notice">
       <%= ngettext("Show 1 post", "Show %{count} posts", @new_posts_count) %>
     </div>
   <% end %>

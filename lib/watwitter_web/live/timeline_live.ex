@@ -14,6 +14,7 @@ defmodule WatwitterWeb.TimelineLive do
 
     {:ok,
      assign(socket,
+       new_posts: [],
        new_posts_count: 0,
        current_post: nil,
        posts: posts,
@@ -32,7 +33,18 @@ defmodule WatwitterWeb.TimelineLive do
     {:noreply, socket}
   end
 
-  def handle_info({:post_created, _post}, socket) do
-    {:noreply, update(socket, :new_posts_count, fn count -> count + 1 end)}
+  def handle_info({:post_created, post}, socket) do
+    {:noreply,
+     socket
+     |> update(:new_posts_count, fn count -> count + 1 end)
+     |> update(:new_posts, fn posts -> [post | posts] end)}
+  end
+
+  def handle_event("show-new-posts", _, socket) do
+    {:noreply,
+     socket
+     |> update(:posts, fn posts -> socket.assigns.new_posts ++ posts end)
+     |> assign(:new_posts, [])
+     |> assign(:new_posts_count, 0)}
   end
 end

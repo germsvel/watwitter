@@ -75,4 +75,17 @@ defmodule WatwitterWeb.TimelineLiveTest do
 
     assert has_element?(view, "#new-posts-notice", "Show 2 posts")
   end
+
+  test "user can view new posts", %{conn: conn} do
+    {:ok, view, _html} = live(conn, "/")
+    new_post = insert(:post)
+    Timeline.broadcast_post_created(new_post)
+
+    view
+    |> element("#new-posts-notice", "Show 1 post")
+    |> render_click()
+
+    assert has_element?(view, "#post-#{new_post.id}")
+    refute has_element?(view, "#new-posts-notice")
+  end
 end
