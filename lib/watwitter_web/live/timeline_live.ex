@@ -40,22 +40,7 @@ defmodule WatwitterWeb.TimelineLive do
      |> update(:new_posts, fn posts -> [post | posts] end)}
   end
 
-  def handle_event("show-new-posts", _, socket) do
-    {:noreply,
-     socket
-     |> update(:posts, fn posts -> socket.assigns.new_posts ++ posts end)
-     |> assign(:new_posts, [])
-     |> assign(:new_posts_count, 0)}
-  end
-
-  def handle_event("like", %{"post_id" => post_id}, socket) do
-    current_user = socket.assigns.current_user
-
-    updated_post =
-      post_id
-      |> Timeline.get_post!()
-      |> Timeline.like_post!(current_user)
-
+  def handle_info({:post_updated, updated_post}, socket) do
     socket =
       socket
       |> update(:posts, fn posts ->
@@ -66,5 +51,13 @@ defmodule WatwitterWeb.TimelineLive do
       end)
 
     {:noreply, socket}
+  end
+
+  def handle_event("show-new-posts", _, socket) do
+    {:noreply,
+     socket
+     |> update(:posts, fn posts -> socket.assigns.new_posts ++ posts end)
+     |> assign(:new_posts, [])
+     |> assign(:new_posts_count, 0)}
   end
 end
