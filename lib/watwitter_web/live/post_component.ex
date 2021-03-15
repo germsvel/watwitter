@@ -34,10 +34,10 @@ defmodule WatwitterWeb.PostComponent do
         </div>
 
         <div class="post-actions">
-          <a class="post-action" href="#">
+          <a class="post-action">
             <%= SVGHelpers.reply_svg() %>
           </a>
-          <a class="post-action" href="#">
+          <a class="post-action">
             <%= SVGHelpers.repost_svg() %>
             <span class="post-action-count"><%= @post.reposts_count %></span>
           </a>
@@ -47,12 +47,12 @@ defmodule WatwitterWeb.PostComponent do
               <span class="post-action-count" data-role="like-count"><%= @post.likes_count %></span>
             </a>
           <% else %>
-            <a class="post-action" href="#" data-role="like-button">
+            <a class="post-action" data-role="like-button">
               <%= SVGHelpers.like_svg() %>
               <span class="post-action-count" data-role="like-count"><%= @post.likes_count %></span>
             </a>
           <% end %>
-          <a class="post-action" href="#">
+          <a class="post-action">
             <%= SVGHelpers.export_svg() %>
           </a>
         </div>
