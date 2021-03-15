@@ -47,7 +47,7 @@ defmodule WatwitterWeb.PostComponent do
               <span class="post-action-count" data-role="like-count"><%= @post.likes_count %></span>
             </a>
           <% else %>
-            <a class="post-action" data-role="like-button">
+            <a class="post-action" phx-click="like" phx-value-post_id="<%= @post.id %>" data-role="like-button">
               <%= SVGHelpers.like_svg() %>
               <span class="post-action-count" data-role="like-count"><%= @post.likes_count %></span>
             </a>

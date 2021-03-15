@@ -47,4 +47,24 @@ defmodule WatwitterWeb.TimelineLive do
      |> assign(:new_posts, [])
      |> assign(:new_posts_count, 0)}
   end
+
+  def handle_event("like", %{"post_id" => post_id}, socket) do
+    current_user = socket.assigns.current_user
+
+    updated_post =
+      post_id
+      |> Timeline.get_post!()
+      |> Timeline.like_post!(current_user)
+
+    socket =
+      socket
+      |> update(:posts, fn posts ->
+        Enum.map(posts, fn
+          %{id: id} when id == updated_post.id -> updated_post
+          post -> post
+        end)
+      end)
+
+    {:noreply, socket}
+  end
 end

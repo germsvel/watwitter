@@ -88,4 +88,15 @@ defmodule WatwitterWeb.TimelineLiveTest do
     assert has_element?(view, "#post-#{new_post.id}")
     refute has_element?(view, "#new-posts-notice")
   end
+
+  test "user can like a post", %{conn: conn} do
+    post = insert(:post, likes_count: 0)
+    {:ok, view, _html} = live(conn, "/")
+
+    view
+    |> element("#post-#{post.id} [data-role=like-button]")
+    |> render_click()
+
+    assert has_element?(view, "#post-#{post.id} [data-role=like-count]", "1")
+  end
 end
