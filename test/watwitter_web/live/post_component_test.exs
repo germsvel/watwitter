@@ -11,7 +11,7 @@ defmodule WatwitterWeb.PostComponentTest do
   test "renders post body and date" do
     post = insert(:post)
 
-    html = render_component(PostComponent, post: post, current_user: insert(:user))
+    html = render_component(PostComponent, id: post.id, post: post, current_user: insert(:user))
 
     assert html =~ post.body
     assert html =~ DateHelpers.format_short(post.inserted_at)
@@ -21,7 +21,7 @@ defmodule WatwitterWeb.PostComponentTest do
     user = insert(:user)
     post = insert(:post, user: user)
 
-    html = render_component(PostComponent, post: post, current_user: insert(:user))
+    html = render_component(PostComponent, id: post.id, post: post, current_user: insert(:user))
 
     assert html =~ user.name
     assert html =~ "@#{user.username}"
@@ -31,7 +31,7 @@ defmodule WatwitterWeb.PostComponentTest do
   test "renders like button and like count" do
     post = insert(:post, likes_count: 876)
 
-    html = render_component(PostComponent, post: post, current_user: insert(:user))
+    html = render_component(PostComponent, id: post.id, post: post, current_user: insert(:user))
 
     assert html =~ data_role("like-button")
     assert html =~ data_role("like-count")
@@ -42,7 +42,7 @@ defmodule WatwitterWeb.PostComponentTest do
     current_user = insert(:user)
     post = insert(:post, likes: [%Like{user_id: current_user.id}])
 
-    html = render_component(PostComponent, post: post, current_user: current_user)
+    html = render_component(PostComponent, id: post.id, post: post, current_user: current_user)
 
     assert html =~ data_role("post-liked")
     refute html =~ data_role("like-button")
