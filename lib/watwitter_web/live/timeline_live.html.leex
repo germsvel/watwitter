@@ -11,11 +11,11 @@
       <%= ngettext("Show 1 post", "Show %{count} posts", @new_posts_count) %>
     </div>
   <% end %>
-  <%= for post <- @posts do %>
-    <%= if @current_post && @current_post.id == post.id do %>
-      <%= live_component @socket, ShowPostComponent, post: post, current_user: @current_user %>
+  <%= for post_id <- @post_ids do %>
+    <%= if @current_post_id && @current_post_id == post_id do %>
+      <%= live_component @socket, ShowPostComponent, id: post_id, current_user: @current_user %>
     <% else %>
-      <%= live_component @socket, PostComponent, id: post.id, post: post, current_user: @current_user %>
+      <%= live_component @socket, PostComponent, id: post_id, current_user: @current_user %>
     <% end %>
   <% end %>
 </div>

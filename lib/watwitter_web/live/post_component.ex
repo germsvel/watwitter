@@ -5,6 +5,15 @@ defmodule WatwitterWeb.PostComponent do
   alias WatwitterWeb.DateHelpers
   alias WatwitterWeb.SVGHelpers
 
+  def preload(list_of_assigns) do
+    list_of_ids = Enum.map(list_of_assigns, & &1.id)
+    posts = Timeline.get_posts(list_of_ids)
+
+    Enum.map(list_of_assigns, fn assigns ->
+      Map.put(assigns, :post, Enum.find(posts, fn post -> post.id == assigns.id end))
+    end)
+  end
+
   def render(assigns) do
     ~L"""
     <div id="post-<%= @post.id %>" class="post">
@@ -71,8 +80,6 @@ defmodule WatwitterWeb.PostComponent do
     post = socket.assigns.post
     updated_post = Timeline.like_post!(post, current_user)
 
-    send(self(), {:post_updated, updated_post})
-
-    {:noreply, socket}
+    {:noreply, assign(socket, :post, updated_post)}
   end
 end
