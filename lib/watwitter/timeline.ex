@@ -32,6 +32,51 @@ defmodule Watwitter.Timeline do
   end
 
   @doc """
+  Returns the list of post ids.
+
+  ## Examples
+
+      iex> list_post_ids(page: 1, per_page: 2)
+      [1, ...]
+
+  """
+  def list_post_ids(opts \\ []) do
+    page = Keyword.get(opts, :page, 1)
+    per_page = Keyword.get(opts, :per_page, 10)
+
+    from(p in Post,
+      select: p.id,
+      offset: ^((page - 1) * per_page),
+      limit: ^per_page,
+      order_by: [desc: p.id]
+    )
+    |> Repo.all()
+  end
+
+  @doc """
+  Returns the list of posts given a set of ids.
+
+  ## Examples
+
+      iex> get_posts([1, 2], page: 1, per_page: 2)
+      [%Post{id: 1}, ...]
+
+  """
+  def get_posts(ids, opts \\ []) do
+    page = Keyword.get(opts, :page, 1)
+    per_page = Keyword.get(opts, :per_page, 10)
+
+    from(p in Post,
+      where: p.id in ^ids,
+      offset: ^((page - 1) * per_page),
+      limit: ^per_page,
+      order_by: [desc: p.id]
+    )
+    |> Repo.all()
+    |> Repo.preload([:user, :likes])
+  end
+
+  @doc """
   Gets a single post.
 
   Raises `Ecto.NoResultsError` if the Post does not exist.

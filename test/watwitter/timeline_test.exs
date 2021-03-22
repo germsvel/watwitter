@@ -20,6 +20,37 @@ defmodule Watwitter.TimelineTest do
     end
   end
 
+  describe "list_post_ids/1" do
+    test "returns a list of post ids" do
+      post = insert(:post)
+      assert Timeline.list_post_ids() == [post.id]
+    end
+
+    test "list_post_ids/1 accepts pagination" do
+      insert_list(3, :post)
+
+      assert [_id1, _id2] = Timeline.list_post_ids(page: 1, per_page: 2)
+      assert [_id3] = Timeline.list_post_ids(page: 2, per_page: 2)
+    end
+  end
+
+  describe "get_posts/2" do
+    test "returns a list of post based on ids" do
+      %{id: id} = insert(:post)
+
+      [post] = Timeline.get_posts([id])
+
+      assert post.id == id
+    end
+
+    test "accepts pagination" do
+      posts = insert_list(3, :post)
+      ids = Enum.map(posts, & &1.id)
+
+      assert [_id1, _id2] = Timeline.get_posts(ids, page: 1, per_page: 2)
+    end
+  end
+
   describe "get_post!/1" do
     test "get_post!/1 returns the post with given id" do
       post = insert(:post)
