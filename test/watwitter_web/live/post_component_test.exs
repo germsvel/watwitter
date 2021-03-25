@@ -48,5 +48,17 @@ defmodule WatwitterWeb.PostComponentTest do
     refute html =~ data_role("like-button")
   end
 
+  test "user can like a post", %{conn: conn} do
+    post = insert(:post, likes_count: 0)
+    user = insert(:user)
+    {:ok, view, _html} = conn |> log_in_user(user) |> live("/")
+
+    view
+    |> element("#post-#{post.id} [data-role=like-button]")
+    |> render_click()
+
+    assert has_element?(view, "#post-#{post.id} [data-role=like-count]", "1")
+  end
+
   defp data_role(role), do: "data-role=\"#{role}\""
 end
