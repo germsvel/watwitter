@@ -79,7 +79,6 @@ defmodule WatwitterWeb.PostComponent do
     current_user = socket.assigns.current_user
     post = socket.assigns.post
     updated_post = Timeline.like_post!(post, current_user)
-    Timeline.broadcast_post_updated(updated_post)
 
     {:noreply, assign(socket, :post, updated_post)}
   end

@@ -132,7 +132,9 @@ defmodule Watwitter.Timeline do
     |> Like.changeset(%{post_id: post.id, user_id: user.id})
     |> Repo.insert!()
 
-    get_post!(post.id)
+    updated_post = get_post!(post.id)
+    broadcast_post_updated(updated_post)
+    updated_post
   end
 
   @doc """
