@@ -160,6 +160,10 @@ defmodule Watwitter.Timeline do
     Phoenix.PubSub.broadcast(Watwitter.PubSub, @timeline_topic, {:post_created, post})
   end
 
+  def broadcast_post_updated(post) do
+    Phoenix.PubSub.broadcast(Watwitter.PubSub, @timeline_topic, {:post_updated, post})
+  end
+
   defp broadcast({:error, _} = error, _), do: error
 
   defp broadcast({:ok, post} = ok_tuple, _event) do
