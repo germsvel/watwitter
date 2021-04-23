@@ -88,4 +88,20 @@ defmodule WatwitterWeb.TimelineLiveTest do
     assert has_element?(view, "#post-#{new_post.id}")
     refute has_element?(view, "#new-posts-notice")
   end
+
+  test "updates rendered post when receiving a post-update message", %{conn: conn} do
+    post = insert(:post, likes_count: 0)
+    {:ok, view, _html} = live(conn, "/")
+    updated_post = update_post(post, %{likes_count: 3})
+
+    Timeline.broadcast_post_updated(updated_post)
+
+    assert has_element?(view, "#post-#{updated_post.id} [data-role=like-count]", "3")
+  end
+
+  defp update_post(post, changes) do
+    post
+    |> Ecto.Changeset.change(changes)
+    |> Watwitter.Repo.update!()
+  end
 end

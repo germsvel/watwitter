@@ -39,6 +39,12 @@ defmodule WatwitterWeb.TimelineLive do
      |> update(:new_post_ids, fn post_ids -> [post.id | post_ids] end)}
   end
 
+  def handle_info({:post_updated, post}, socket) do
+    send_update(PostComponent, id: post.id)
+
+    {:noreply, socket}
+  end
+
   def handle_event("show-new-posts", _, socket) do
     {:noreply,
      socket
