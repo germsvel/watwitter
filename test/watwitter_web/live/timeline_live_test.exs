@@ -27,8 +27,8 @@ defmodule WatwitterWeb.TimelineLiveTest do
     [post1, post2] = insert_pair(:post)
     {:ok, view, _html} = live(conn, "/")
 
-    assert has_element?(view, "#post-#{post1.id}")
-    assert has_element?(view, "#post-#{post2.id}")
+    assert view |> timeline_post(post1) |> has_element?()
+    assert view |> timeline_post(post2) |> has_element?()
   end
 
   test "user can highlight post by clicking on it", %{conn: conn} do
@@ -36,10 +36,10 @@ defmodule WatwitterWeb.TimelineLiveTest do
     {:ok, view, _html} = live(conn, "/")
 
     view
-    |> element("#post-#{post.id} [data-role=show-post]", post.body)
+    |> post_body(post)
     |> render_click()
 
-    assert has_element?(view, "#show-post-#{post.id}")
+    assert view |> highlighted_post(post) |> has_element?()
   end
 
   test "user can navigate to user settings", %{conn: conn} do
@@ -47,7 +47,7 @@ defmodule WatwitterWeb.TimelineLiveTest do
 
     {:ok, conn} =
       view
-      |> element("#user-avatar")
+      |> user_avatar()
       |> render_click()
       |> follow_redirect(conn, Routes.user_settings_path(conn, :edit))
 
@@ -59,7 +59,7 @@ defmodule WatwitterWeb.TimelineLiveTest do
 
     {:ok, _view, html} =
       view
-      |> element("#compose-button")
+      |> compose_button()
       |> render_click()
       |> follow_redirect(conn, Routes.compose_path(conn, :new))
 
@@ -73,7 +73,7 @@ defmodule WatwitterWeb.TimelineLiveTest do
     Timeline.broadcast_post_created(post1)
     Timeline.broadcast_post_created(post2)
 
-    assert has_element?(view, "#new-posts-notice", "Show 2 posts")
+    assert view |> new_posts_notice("Show 2 posts") |> has_element?()
   end
 
   test "user can view new posts", %{conn: conn} do
@@ -82,11 +82,11 @@ defmodule WatwitterWeb.TimelineLiveTest do
     Timeline.broadcast_post_created(new_post)
 
     view
-    |> element("#new-posts-notice", "Show 1 post")
+    |> new_posts_notice("Show 1 post")
     |> render_click()
 
-    assert has_element?(view, "#post-#{new_post.id}")
-    refute has_element?(view, "#new-posts-notice")
+    assert view |> timeline_post(new_post) |> has_element?()
+    refute view |> new_posts_notice() |> has_element?()
   end
 
   test "updates rendered post when receiving a post-update message", %{conn: conn} do
@@ -96,12 +96,44 @@ defmodule WatwitterWeb.TimelineLiveTest do
 
     Timeline.broadcast_post_updated(updated_post)
 
-    assert has_element?(view, "#post-#{updated_post.id} [data-role=like-count]", "3")
+    assert view |> post_like_count(updated_post, "3") |> has_element?()
   end
 
   defp update_post(post, changes) do
     post
     |> Ecto.Changeset.change(changes)
     |> Watwitter.Repo.update!()
+  end
+
+  defp timeline_post(view, post) do
+    element(view, post_card(post))
+  end
+
+  defp highlighted_post(view, post) do
+    element(view, "#show-post-#{post.id}")
+  end
+
+  defp post_body(view, post) do
+    element(view, post_card(post) <> " [data-role=show-post]", post.body)
+  end
+
+  defp post_like_count(view, post, count) do
+    element(view, post_card(post) <> " [data-role=like-count]", count)
+  end
+
+  defp user_avatar(view) do
+    element(view, "#user-avatar")
+  end
+
+  defp compose_button(view) do
+    element(view, "#compose-button")
+  end
+
+  defp new_posts_notice(view, text \\ nil) do
+    element(view, "#new-posts-notice", text)
+  end
+
+  defp post_card(post) do
+    "#post-#{post.id}"
   end
 end
