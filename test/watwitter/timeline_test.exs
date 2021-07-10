@@ -42,13 +42,6 @@ defmodule Watwitter.TimelineTest do
 
       assert post.id == id
     end
-
-    test "accepts pagination" do
-      posts = insert_list(3, :post)
-      ids = Enum.map(posts, & &1.id)
-
-      assert [_id1, _id2] = Timeline.get_posts(ids, page: 1, per_page: 2)
-    end
   end
 
   describe "get_post!/1" do
