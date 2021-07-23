@@ -12,11 +12,13 @@
     </div>
   <% end %>
   <%= for post_id <- @post_ids do %>
-    <%= if @current_post_id && @current_post_id == post_id do %>
-      <%= live_component @socket, ShowPostComponent, id: post_id, current_user: @current_user %>
-    <% else %>
-      <%= live_component @socket, PostComponent, id: post_id, current_user: @current_user %>
-    <% end %>
+    <div data-role="post">
+      <%= if @current_post_id && @current_post_id == post_id do %>
+        <%= live_component @socket, ShowPostComponent, id: post_id, current_user: @current_user %>
+      <% else %>
+        <%= live_component @socket, PostComponent, id: post_id, current_user: @current_user %>
+      <% end %>
+    </div>
   <% end %>
 
   <div class="load-more-placeholder" id="load-more" phx-hook="InfiniteScroll">
