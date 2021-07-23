@@ -89,6 +89,22 @@ defmodule WatwitterWeb.TimelineLiveTest do
     refute view |> new_posts_notice() |> has_element?()
   end
 
+  test "user sees new posts at the top of timeline", %{conn: conn} do
+    previous_post = insert(:post)
+    {:ok, view, _html} = live(conn, "/")
+    new_post = insert(:post)
+    Timeline.broadcast_post_created(new_post)
+
+    rendered =
+      view
+      |> new_posts_notice("Show 1 post")
+      |> render_click()
+
+    [top_card, bottom_card] = all_post_cards(rendered)
+    assert element_text(top_card) =~ new_post.body
+    assert element_text(bottom_card) =~ previous_post.body
+  end
+
   test "updates rendered post when receiving a post-update message", %{conn: conn} do
     post = insert(:post, likes_count: 0)
     {:ok, view, _html} = live(conn, "/")
@@ -110,6 +126,14 @@ defmodule WatwitterWeb.TimelineLiveTest do
     assert view |> timeline_post(newest) |> has_element?()
     assert view |> timeline_post(oldest) |> has_element?()
   end
+
+  defp all_post_cards(html) do
+    html
+    |> Floki.parse_document!()
+    |> Floki.find("[data-role='post']")
+  end
+
+  defp element_text(el), do: Floki.text(el)
 
   defp update_post(post, changes) do
     post
