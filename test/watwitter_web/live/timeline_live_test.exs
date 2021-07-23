@@ -105,6 +105,19 @@ defmodule WatwitterWeb.TimelineLiveTest do
     assert element_text(bottom_card) =~ previous_post.body
   end
 
+  test "user sees new posts at the top of timeline (CSS selectors)", %{conn: conn} do
+    insert(:post)
+    {:ok, view, _html} = live(conn, "/")
+    new_post = insert(:post)
+    Timeline.broadcast_post_created(new_post)
+
+    view
+    |> new_posts_notice("Show 1 post")
+    |> render_click()
+
+    assert view |> first_post(new_post.body) |> has_element?()
+  end
+
   test "updates rendered post when receiving a post-update message", %{conn: conn} do
     post = insert(:post, likes_count: 0)
     {:ok, view, _html} = live(conn, "/")
@@ -139,6 +152,10 @@ defmodule WatwitterWeb.TimelineLiveTest do
     post
     |> Ecto.Changeset.change(changes)
     |> Watwitter.Repo.update!()
+  end
+
+  defp first_post(view, text) do
+    element(view, "[data-role='post']:first-of-type", text)
   end
 
   def load_more_posts(view) do
