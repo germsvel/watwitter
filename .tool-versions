@@ -1,3 +1,3 @@
 elixir 1.11.2-otp-23
-erlang 23.1
-nodejs 12.14.1
+erlang 23.3.4.3
+nodejs 16.3.0
