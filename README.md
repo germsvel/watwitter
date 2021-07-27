@@ -1,12 +1,12 @@
 # Welcome to Watwitter 🎉
 
-Watwitter is a twitter(ish) clone to learn to test LiveView.
-
-If you're never played around with LiveView, I highly recommend the free
-[PragmaticStudio course](https://pragmaticstudio.com/phoenix-liveview).
+Watwitter is a twitter(ish) clone to learn to test LiveView with my [Testing
+LiveView] course.
 
 ## Getting set up
 
+* Install Elixir, Erlang, and Node versions defined in
+  [`.tool-versions`](./.tool-versions)
 * Install dependencies with `mix deps.get`
 * Create and migrate your database with `mix ecto.setup`
 * Install Node.js dependencies with `npm install` inside the `assets` directory
@@ -35,12 +35,16 @@ video will show which branch you should be on:
 - `8-testing-live-navigation`
 - `9-testing-form-submission`
 - `10-test-change-validation`
+- ...
 
 So for the video on Testing Rendering, you can `git checkout
 1-testing-rendering`, and then implement the code following the lesson.
 
 Happy testing! 🥳
 
-## Other Resources
+## Resources
 
+- [Testing LiveView course][Testing LiveView]
 - [`Phoenix.LiveViewTest` docs](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveViewTest.html)
+
+[Testing LiveView]: https://www.testingliveview.com/
