@@ -164,11 +164,11 @@
 }
 
 .compose-actions {
-  @apply mt-4 flex flex-row-reverse;
+  @apply mt-4 flex flex-row justify-between h-6 w-6 text-blue-500 fill-current;
 }
 
 .compose-btn {
-  @apply px-4 py-2 h-8 rounded-full flex items-center justify-center bg-blue-500 text-white;
+  @apply px-4 py-2 rounded-full bg-blue-500 text-white;
 }
 
 // General forms

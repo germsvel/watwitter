@@ -1,8 +1,12 @@
-<header class="header">
-  <%= live_redirect to: Routes.timeline_path(@socket, :index) do %>
-    <%= SVGHelpers.back_svg() %>
-  <% end %>
-  <h1 class="header-title">Compose Watweet</h1>
+<header class="header justify-between">
+  <div class="items-center flex flex-1">
+    <%= live_redirect to: Routes.timeline_path(@socket, :index) do %>
+      <%= SVGHelpers.back_svg() %>
+    <% end %>
+    <h1 class="header-title">Compose Watweet</h1>
+  </div>
+
+  <button form="new-post" class="compose-btn">Post<button>
 </header>
 
 <div class="body">
@@ -15,10 +19,6 @@
           <%= textarea f, :body, placeholder: "What's happening?", class: "compose-textarea" %>
         </div>
         <%= error_tag f, :body %>
-      </div>
-
-      <div class="compose-actions">
-        <button class="compose-btn">Post<button>
       </div>
     </form>
   </div>
