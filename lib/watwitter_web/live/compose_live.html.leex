@@ -19,6 +19,24 @@
           <%= textarea f, :body, placeholder: "What's happening?", class: "compose-textarea" %>
         </div>
         <%= error_tag f, :body %>
+
+        <%= for {_ref, err} <- @uploads.photos.errors do %>
+          <p class="invalid-feedback"><%= humanize(err) %></p>
+        <% end %>
+
+        <%= for entry <- @uploads.photos.entries do %>
+          <figure data-role="photo-preview">
+            <a href="#" name="cancel-upload" phx-click="cancel-upload" phx-value-ref="<%= entry.ref %>" aria-label="cancel">&times;</a>
+            <%= live_img_preview entry %>
+          </figure>
+        <% end %>
+      </div>
+
+      <div class="compose-actions">
+        <label class="cursor-pointer">
+          <%= SVGHelpers.photos_svg() %>
+          <%= live_file_input @uploads.photos, class: "sr-only" %>
+        </label>
       </div>
     </form>
   </div>
