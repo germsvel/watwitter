@@ -139,6 +139,14 @@
   @apply text-sm p-px;
 }
 
+.post-images {
+  @apply mt-2 flex justify-between;
+}
+
+.post-image {
+  @apply rounded-md h-64 w-32 object-cover flex-1;
+}
+
 // Compose
 
 .compose-wrapper {
