@@ -58,7 +58,7 @@ config :watwitter, WatwitterWeb.Endpoint,
 config :watwitter, WatwitterWeb.Endpoint,
   live_reload: [
     patterns: [
-      ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
+      ~r"priv/static/[^uploads].*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
       ~r"lib/watwitter_web/(live|views)/.*(ex)$",
       ~r"lib/watwitter_web/templates/.*(eex)$"
