@@ -1,9 +1,16 @@
 defmodule WatwitterWeb.ComposeLiveTest do
-  use WatwitterWeb.ConnCase
+  use WatwitterWeb.ConnCase, async: false
 
   import Phoenix.LiveViewTest
 
   setup :register_and_log_in_user
+
+  setup do
+    on_exit(fn ->
+      File.rm_rf!(uploads_dir())
+      File.mkdir!(uploads_dir())
+    end)
+  end
 
   test "user can create a new post", %{conn: conn} do
     {:ok, view, _html} = live(conn, Routes.compose_path(conn, :new))
@@ -91,6 +98,32 @@ defmodule WatwitterWeb.ComposeLiveTest do
     assert has_element?(view, "[data-role='photo-preview']")
   end
 
+  test "images are persisted and user can see them", %{conn: conn} do
+    {:ok, view, _html} = live(conn, Routes.compose_path(conn, :new))
+
+    {:ok, _, html} =
+      view
+      |> upload("moria-durins-door.png")
+      |> post_watweet("Speak, friend, and enter")
+      |> follow_redirect(conn, Routes.timeline_path(conn, :index))
+
+    image_url = html |> find_image() |> get_src()
+
+    assert conn |> get(image_url) |> response(200)
+  end
+
+  defp find_image(html) do
+    html
+    |> Floki.parse_document!()
+    |> Floki.find("[data-role='post-image']")
+    |> hd()
+  end
+
+  defp get_src(node) do
+    [src] = Floki.attribute(node, "src")
+    src
+  end
+
   defp post_watweet(view, text) do
     view
     |> form("#new-post", post: %{body: text})
@@ -115,5 +148,9 @@ defmodule WatwitterWeb.ComposeLiveTest do
     view
     |> element("[name='cancel-upload']")
     |> render_click()
+  end
+
+  defp uploads_dir do
+    Application.app_dir(:watwitter, "priv/static/uploads")
   end
 end
