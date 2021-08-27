@@ -30,6 +30,12 @@ defmodule WatwitterWeb.ShowPostComponent do
 
       <div class="show-body">
         <%= @post.body %>
+
+        <div class="post-images">
+          <%= for photo_url <- @post.photo_urls do %>
+            <img class="post-image" data-role="post-image" src="<%= photo_url %>">
+          <% end %>
+        </div>
       </div>
 
       <div class="show-actions">

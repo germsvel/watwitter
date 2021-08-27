@@ -17,7 +17,7 @@ defmodule Watwitter.Timeline.Post do
   @doc false
   def changeset(post, attrs) do
     post
-    |> cast(attrs, [:body, :user_id])
+    |> cast(attrs, [:body, :user_id, :photo_urls])
     |> validate_required([:body, :user_id])
     |> validate_length(:body, min: 2, max: 250)
   end

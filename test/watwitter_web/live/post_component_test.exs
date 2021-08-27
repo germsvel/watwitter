@@ -60,5 +60,16 @@ defmodule WatwitterWeb.PostComponentTest do
     assert has_element?(view, "#post-#{post.id} [data-role=like-count]", "1")
   end
 
+  test "renders post's images when present" do
+    gimli_url = "/images/gimli.png"
+    legolas_url = "/images/legolas.png"
+    post = insert(:post, photo_urls: [gimli_url, legolas_url])
+
+    html = render_component(PostComponent, id: post.id, post: post, current_user: insert(:user))
+
+    assert html =~ gimli_url
+    assert html =~ legolas_url
+  end
+
   defp data_role(role), do: "data-role=\"#{role}\""
 end

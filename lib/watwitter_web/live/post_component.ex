@@ -41,6 +41,12 @@ defmodule WatwitterWeb.PostComponent do
           <%= live_patch to: Routes.timeline_path(@socket, :index, post_id: @post.id), data: [role: "show-post"] do %>
             <%= @post.body %>
           <% end %>
+
+          <div class="post-images">
+            <%= for photo_url <- @post.photo_urls do %>
+              <img class="post-image" data-role="post-image" src="<%= photo_url %>">
+            <% end %>
+          </div>
         </div>
 
         <div class="post-actions">

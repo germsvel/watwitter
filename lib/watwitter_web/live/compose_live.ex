@@ -20,7 +20,19 @@ defmodule WatwitterWeb.ComposeLive do
 
   def handle_event("save", %{"post" => post_params}, socket) do
     current_user = socket.assigns.current_user
-    params = Map.put(post_params, "user_id", current_user.id)
+
+    photo_urls =
+      consume_uploaded_entries(socket, :photos, fn %{path: path}, entry ->
+        dest = Path.join(uploads_dir(), filename(entry))
+        File.cp!(path, dest)
+
+        Routes.static_path(socket, "/uploads/#{filename(entry)}")
+      end)
+
+    params =
+      post_params
+      |> Map.put("user_id", current_user.id)
+      |> Map.put("photo_urls", photo_urls)
 
     case Timeline.create_post(params) do
       {:ok, _post} ->
@@ -45,5 +57,14 @@ defmodule WatwitterWeb.ComposeLive do
 
   def handle_event("cancel-upload", %{"ref" => ref}, socket) do
     {:noreply, cancel_upload(socket, :photos, ref)}
+  end
+
+  defp uploads_dir do
+    Application.app_dir(:watwitter, "priv/static/uploads")
+  end
+
+  defp filename(entry) do
+    [ext | _] = MIME.extensions(entry.client_type)
+    "#{entry.uuid}.#{ext}"
   end
 end
