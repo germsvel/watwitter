@@ -81,6 +81,16 @@ defmodule WatwitterWeb.ComposeLiveTest do
     assert has_element?(timeline, "[data-role='post-image']")
   end
 
+  test "failing to submit post does not remove image previews", %{conn: conn} do
+    {:ok, view, _html} = live(conn, Routes.compose_path(conn, :new))
+
+    view
+    |> upload("moria-durins-door.png")
+    |> post_watweet(nil)
+
+    assert has_element?(view, "[data-role='photo-preview']")
+  end
+
   defp post_watweet(view, text) do
     view
     |> form("#new-post", post: %{body: text})
