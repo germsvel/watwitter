@@ -3,6 +3,8 @@ defmodule WatwitterWeb.ComposeLiveTest do
 
   import Phoenix.LiveViewTest
 
+  alias Watwitter.CloudinaryUpload
+
   setup :register_and_log_in_user
 
   setup do
@@ -88,6 +90,19 @@ defmodule WatwitterWeb.ComposeLiveTest do
     assert has_element?(timeline, "[data-role='post-image']")
   end
 
+  test "submitting posts with images stores correct image urls", %{conn: conn} do
+    {:ok, view, _html} = live(conn, Routes.compose_path(conn, :new))
+
+    {:ok, timeline, _html} =
+      view
+      |> upload("moria-durins-door.png")
+      |> post_watweet("Speak, friend, and enter")
+      |> follow_redirect(conn, Routes.timeline_path(conn, :index))
+
+    assert render(timeline) =~ "Speak, friend, and enter"
+    assert hd(last_post().photo_urls) =~ CloudinaryUpload.image_url(cloud_name())
+  end
+
   test "failing to submit post does not remove image previews", %{conn: conn} do
     {:ok, view, _html} = live(conn, Routes.compose_path(conn, :new))
 
@@ -98,30 +113,43 @@ defmodule WatwitterWeb.ComposeLiveTest do
     assert has_element?(view, "[data-role='photo-preview']")
   end
 
-  test "images are persisted and user can see them", %{conn: conn} do
+  test "application generates correct metadata to store files externally", %{conn: conn} do
     {:ok, view, _html} = live(conn, Routes.compose_path(conn, :new))
 
-    {:ok, _, html} =
+    {:ok, meta} =
       view
-      |> upload("moria-durins-door.png")
-      |> post_watweet("Speak, friend, and enter")
-      |> follow_redirect(conn, Routes.timeline_path(conn, :index))
+      |> add_image("moria-durins-door.png")
+      |> preflight_upload()
 
-    image_url = html |> find_image() |> get_src()
+    assert %{entries: entries} = meta
 
-    assert conn |> get(image_url) |> response(200)
+    for {_k, v} <- entries do
+      assert v.uploader == "Cloudinary"
+      assert v.url == CloudinaryUpload.image_api_url(cloud_name())
+      assert v.fields[:folder] == "testing-liveview"
+
+      assert is_binary(v.fields[:public_id])
+      refute String.ends_with?(v.fields[:public_id], ".png")
+
+      assert is_binary(v.fields[:signature])
+      refute is_nil(v.fields[:api_key])
+      refute is_nil(v.fields[:timestamp])
+    end
   end
 
-  defp find_image(html) do
-    html
-    |> Floki.parse_document!()
-    |> Floki.find("[data-role='post-image']")
-    |> hd()
+  defp last_post do
+    Watwitter.Timeline.Post |> Ecto.Query.last() |> Watwitter.Repo.one()
   end
 
-  defp get_src(node) do
-    [src] = Floki.attribute(node, "src")
-    src
+  defp add_image(view, filename) do
+    view
+    |> file_input("#new-post", :photos, [
+      %{
+        name: filename,
+        content: File.read!("test/support/images/#{filename}"),
+        type: "image/png"
+      }
+    ])
   end
 
   defp post_watweet(view, text) do
@@ -132,13 +160,7 @@ defmodule WatwitterWeb.ComposeLiveTest do
 
   defp upload(view, filename) do
     view
-    |> file_input("#new-post", :photos, [
-      %{
-        name: filename,
-        content: File.read!("test/support/images/#{filename}"),
-        type: "image/png"
-      }
-    ])
+    |> add_image(filename)
     |> render_upload(filename)
 
     view
@@ -152,5 +174,9 @@ defmodule WatwitterWeb.ComposeLiveTest do
 
   defp uploads_dir do
     Application.app_dir(:watwitter, "priv/static/uploads")
+  end
+
+  defp cloud_name do
+    Application.get_env(:watwitter, :cloudinary)[:cloud_name]
   end
 end

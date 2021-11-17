@@ -2,6 +2,7 @@ defmodule WatwitterWeb.ComposeLive do
   use WatwitterWeb, :live_view
 
   alias Watwitter.Accounts
+  alias Watwitter.CloudinaryUpload
   alias Watwitter.Timeline
   alias Watwitter.Timeline.Post
   alias WatwitterWeb.SVGHelpers
@@ -13,7 +14,11 @@ defmodule WatwitterWeb.ComposeLive do
     socket =
       socket
       |> assign(changeset: changeset, current_user: current_user)
-      |> allow_upload(:photos, accept: ~w(.jpg .jpeg .png), max_entries: 2)
+      |> allow_upload(:photos,
+        accept: ~w(.jpg .jpeg .png),
+        max_entries: 2,
+        external: &presign_upload/2
+      )
 
     {:ok, socket}
   end
@@ -57,23 +62,51 @@ defmodule WatwitterWeb.ComposeLive do
     {completed, []} = uploaded_entries(socket, :photos)
 
     for entry <- completed do
-      Routes.static_path(socket, "/uploads/#{filename(entry)}")
+      cloudinary_image_url(entry)
     end
   end
 
-  defp save_photos(socket) do
-    consume_uploaded_entries(socket, :photos, fn %{path: path}, entry ->
-      dest = Path.join(uploads_dir(), filename(entry))
-      File.cp!(path, dest)
-    end)
+  defp cloudinary_image_url(entry) do
+    folder = "testing-liveview"
+    cloud_name = cloudinary_config()[:cloud_name]
+    cloudinary_url = CloudinaryUpload.image_url(cloud_name)
+
+    Path.join([cloudinary_url, folder, filename(entry)])
   end
 
-  defp uploads_dir do
-    Application.app_dir(:watwitter, "priv/static/uploads")
+  defp save_photos(socket) do
+    consume_uploaded_entries(socket, :photos, fn _, _ -> :ok end)
+  end
+
+  defp presign_upload(entry, socket) do
+    cloud_name = cloudinary_config()[:cloud_name]
+
+    credentials = %{
+      api_key: cloudinary_config()[:api_key],
+      api_secret: cloudinary_config()[:api_secret]
+    }
+
+    fields = %{
+      folder: "testing-liveview",
+      public_id: filename(entry)
+    }
+
+    updated_fields = CloudinaryUpload.sign_form_upload(fields, credentials)
+
+    meta = %{
+      uploader: "Cloudinary",
+      url: CloudinaryUpload.image_api_url(cloud_name),
+      fields: updated_fields
+    }
+
+    {:ok, meta, socket}
+  end
+
+  defp cloudinary_config do
+    Application.get_env(:watwitter, :cloudinary)
   end
 
   defp filename(entry) do
-    [ext | _] = MIME.extensions(entry.client_type)
-    "#{entry.uuid}.#{ext}"
+    entry.uuid
   end
 end

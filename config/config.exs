@@ -28,6 +28,11 @@ config :phoenix, :json_library, Jason
 
 config :watwitter, :avatar_client, Watwitter.Avatar.Gravatar
 
+config :watwitter, :cloudinary,
+  api_key: System.get_env("CLOUDINARY_API_KEY"),
+  api_secret: System.get_env("CLOUDINARY_API_SECRET"),
+  cloud_name: System.get_env("CLOUDINARY_CLOUD_NAME")
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env()}.exs"

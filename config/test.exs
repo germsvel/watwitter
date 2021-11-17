@@ -25,3 +25,8 @@ config :watwitter, :avatar_client, Watwitter.Avatar.TestClient
 
 # Print only warnings and errors during test
 config :logger, level: :warn
+
+config :watwitter, :cloudinary,
+  api_key: 123,
+  api_secret: "abc123",
+  cloud_name: "demo"
